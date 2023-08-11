@@ -10,16 +10,17 @@ import UIKit
 
 class ViewController: UITableViewController {
     
-    let itemArray = ["Find Mike", "Buy Eggs"]
+    var itemArray = ["Find Mike", "Buy Eggs"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        print("ini view DIDLOAD")
     }
     
     //MARK: TableViewDataSource
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return itemArray.count
+        
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -37,17 +38,30 @@ class ViewController: UITableViewController {
             tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
         }
         
-        
         tableView.deselectRow(at: indexPath, animated: true)
         
+    }
+    
+    
+    @IBAction func buttonNext(_ sender: UIButton) {
+        self.performSegue(withIdentifier: "AnimationView", sender: self)
     }
     
     //MARK: Add New Item
     
     @IBAction func addButtonPress(_ sender: UIBarButtonItem) {
+        var textField = UITextField()
         let alert = UIAlertController(title: "Add New Item", message: "", preferredStyle: .alert)
+        
         let action = UIAlertAction(title: "Add Item", style: .default) { action in
-            
+            print(textField.text!)
+            self.itemArray.append(textField.text!)
+            self.tableView.reloadData()
+        }
+        
+        alert.addTextField { alertTextField in
+            alertTextField.placeholder = "Create New item"
+            textField = alertTextField
         }
         
         alert.addAction(action)
