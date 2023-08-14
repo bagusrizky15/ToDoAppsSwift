@@ -6,6 +6,5 @@ target 'Todoey' do
   use_frameworks!
 
   # Pods for Todoey
-  pod 'RiveRuntime'
 
 end
