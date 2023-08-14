@@ -11,7 +11,7 @@ import UIKit
 class ViewController: UITableViewController {
     
     var itemArray = [Item]()
-    let defaults = UserDefaults.standard
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Item.plist")
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,9 +24,7 @@ class ViewController: UITableViewController {
         newItem2.title = "Find Mike"
         itemArray.append(newItem2)
         
-        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
-            itemArray = items
-        }
+        loadItems()
         
     }
     
@@ -58,9 +56,9 @@ class ViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //add boolean
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+        saveItems()
         //add animation
         tableView.deselectRow(at: indexPath, animated: true)
-        tableView.reloadData()
     }
     
     
@@ -79,11 +77,9 @@ class ViewController: UITableViewController {
             newItem.title = textField.text!
             self.itemArray.append(newItem)
             
-            //encode
-            self.defaults.set(self.itemArray, forKey: "TodoListArray")
+            //save
+            self.saveItems()
             
-            //reload table
-            self.tableView.reloadData()
         }
         
         alert.addTextField { alertTextField in
@@ -93,6 +89,30 @@ class ViewController: UITableViewController {
         
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
+    }
+    
+    //MARK: Model Manipulations Method
+    func saveItems(){
+        let encoder = PropertyListEncoder()
+        do {
+            let data = try encoder.encode(itemArray)
+            try data.write(to: dataFilePath!)
+        } catch {
+            print(error)
+        }
+        //reload table
+        self.tableView.reloadData()
+    }
+    
+    func loadItems(){
+        let decoder = PropertyListDecoder()
+        do{
+            let data = try Data(contentsOf: dataFilePath!)
+            let item = try decoder.decode([Item].self, from: data)
+            itemArray = item
+        } catch {
+            print(error)
+        }
     }
     
 }
