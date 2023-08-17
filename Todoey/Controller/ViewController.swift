@@ -2,27 +2,21 @@
 //  ViewController.swift
 //  Todoey
 //
-//  Created by Philipp Muellauer on 02/12/2019.
-//  Copyright © 2019 App Brewery. All rights reserved.
+//  Created by Bagus Rizky on 17/08/2023.
+//  Copyright © 2023 App Brewery. All rights reserved.
 //
 
 import UIKit
+import CoreData
 
 class ViewController: UITableViewController {
     
-    var itemArray = [Item]()
-    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Item.plist")
+    var itemArray = [Entity]()
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    var textField = UITextField()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let newItem = Item()
-        newItem.title = "Find Mike"
-        itemArray.append(newItem)
-        
-        let newItem2 = Item()
-        newItem2.title = "Find Mike"
-        itemArray.append(newItem2)
         
         loadItems()
         
@@ -54,27 +48,71 @@ class ViewController: UITableViewController {
     //MARK: TableView Delegate Method
     //func when cell click
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //add boolean
-        itemArray[indexPath.row].done = !itemArray[indexPath.row].done
-        saveItems()
+        let alert = UIAlertController(title: "Edit", message: "", preferredStyle: .alert)
+        let action = UIAlertAction(title: "Edit", style: .default){
+            action in
+            
+            //check
+            if self.textField.text == "" {
+                self.itemArray[indexPath.row].setValue(self.itemArray[indexPath.row].title, forKey: "title")
+            }else{
+                //set value
+                self.itemArray[indexPath.row].setValue(self.textField.text, forKey: "title")
+            }
+            self.saveItems()
+        }
+        
+        //add checklist
+        //itemArray[indexPath.row].done = !itemArray[indexPath.row].done
         //add animation
-        tableView.deselectRow(at: indexPath, animated: true)
+        //tableView.deselectRow(at: indexPath, animated: true)
+        alert.addTextField{
+            alertTextField in
+            alertTextField.placeholder = self.itemArray[indexPath.row].title
+            self.textField = alertTextField
+        }
+        
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
     }
     
     
     //MARK: Add New Item
     
     @IBAction func addButtonPress(_ sender: UIBarButtonItem) {
-        //initialize UITextField
-        var textField = UITextField()
+        showPopUp(tvTitle: "Tambahkan Item Baru", tvButton: "Tambah", tvPlaceHolder: "Belajar")
+    }
+    
+    //MARK: Model Manipulations Method
+    func saveItems(){
+        do{
+            try context.save()
+        }catch {
+            print("error when save \(error)")
+        }
+        tableView.reloadData()
+    }
+    
+    func loadItems(){
+        let req : NSFetchRequest<Entity> = Entity.fetchRequest()
+        do {
+           itemArray = try context.fetch(req)
+        }catch {
+            print("Error when loading \(error)")
+        }
+    }
+    
+    //MARK: PopUp
+    func showPopUp(tvTitle:String, tvButton:String, tvPlaceHolder:String){
         //initialize alert
-        let alert = UIAlertController(title: "Tambahkan Item Baru", message: "", preferredStyle: .alert)
+        let alert = UIAlertController(title: tvTitle, message: "", preferredStyle: .alert)
         
         //action when click
-        let action = UIAlertAction(title: "Tambah", style: .default) { action in
+        let action = UIAlertAction(title: tvButton, style: .default) { action in
             
-            let newItem = Item()
-            newItem.title = textField.text!
+            let newItem = Entity(context: self.context)
+            newItem.title = self.textField.text!
+            newItem.done = false
             self.itemArray.append(newItem)
             
             //save
@@ -83,36 +121,12 @@ class ViewController: UITableViewController {
         }
         
         alert.addTextField { alertTextField in
-            alertTextField.placeholder = "Create New item"
-            textField = alertTextField
+            alertTextField.placeholder = tvPlaceHolder
+            self.textField = alertTextField
         }
         
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
-    }
-    
-    //MARK: Model Manipulations Method
-    func saveItems(){
-        let encoder = PropertyListEncoder()
-        do {
-            let data = try encoder.encode(itemArray)
-            try data.write(to: dataFilePath!)
-        } catch {
-            print(error)
-        }
-        //reload table
-        self.tableView.reloadData()
-    }
-    
-    func loadItems(){
-        let decoder = PropertyListDecoder()
-        do{
-            let data = try Data(contentsOf: dataFilePath!)
-            let item = try decoder.decode([Item].self, from: data)
-            itemArray = item
-        } catch {
-            print(error)
-        }
     }
     
 }
