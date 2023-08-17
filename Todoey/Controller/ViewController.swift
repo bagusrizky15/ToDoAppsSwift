@@ -3,7 +3,7 @@
 //  Todoey
 //
 //  Created by Bagus Rizky on 17/08/2023.
-//  Copyright © 2023 App Brewery. All rights reserved.
+//  Copyright © 2023. All rights reserved.
 //
 
 import UIKit
@@ -49,6 +49,14 @@ class ViewController: UITableViewController {
     //func when cell click
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let alert = UIAlertController(title: "Edit", message: "", preferredStyle: .alert)
+        let delete = UIAlertAction(title: "Delete", style: .cancel){
+            delete in
+            
+            self.context.delete(self.itemArray[indexPath.row])
+            self.itemArray.remove(at: indexPath.row)
+            self.saveItems()
+            
+        }
         let action = UIAlertAction(title: "Edit", style: .default){
             action in
             
@@ -71,7 +79,7 @@ class ViewController: UITableViewController {
             alertTextField.placeholder = self.itemArray[indexPath.row].title
             self.textField = alertTextField
         }
-        
+        alert.addAction(delete)
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
     }

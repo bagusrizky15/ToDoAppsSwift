@@ -8,7 +8,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Todoey-->
+        <!--Todo Apps-->
         <scene sceneID="WdZ-Tu-1OF">
             <objects>
                 <tableViewController id="OGz-T8-LrI" customClass="ViewController" customModule="Todoey" customModuleProvider="target" sceneMemberID="viewController">
@@ -31,7 +31,7 @@
                             <outlet property="delegate" destination="OGz-T8-LrI" id="g0T-QU-er4"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Todoey" id="pr0-49-vfc">
+                    <navigationItem key="navigationItem" title="Todo Apps" id="pr0-49-vfc">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="iiW-lZ-JPa">
                             <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <connections>
